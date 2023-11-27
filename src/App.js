@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const PaymentForm = () => {
   const [orderDetails, setOrderDetails] = useState({
@@ -16,16 +17,9 @@ const PaymentForm = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://payl-payment.vercel.app/api/payment/test/registerOrderBinding', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderDetails),
-      });
-
-      const data = await response.json();
-      console.log('Step 1 Response:', data);
+      const response = await axios.post('https://payl-payment.vercel.app/api/payment/test/registerOrderBinding', orderDetails);
+      
+      console.log('Step 1 Response:', response.data);
 
       // After receiving the response, proceed to the next step
       handlePaymentDetailsSubmit();
@@ -36,19 +30,12 @@ const PaymentForm = () => {
 
   const handlePaymentDetailsSubmit = async () => {
     try {
-      const response = await fetch('https://payl-payment.vercel.app/api/payment/test/orderBinding', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          mdOrder: paymentDetails.mdOrder,
-          bindingId: paymentDetails.bindingId,
-        }),
+      const response = await axios.post('https://payl-payment.vercel.app/api/payment/test/orderBinding', {
+        mdOrder: paymentDetails.mdOrder,
+        bindingId: paymentDetails.bindingId,
       });
 
-      const data = await response.json();
-      console.log('Step 2 Response:', data);
+      console.log('Step 2 Response:', response.data);
     } catch (error) {
       console.error('Step 2 Error:', error);
     }
@@ -84,7 +71,7 @@ const PaymentForm = () => {
           />
         </label>
         <br />
-        <button type="submit">Submit</button>
+        <button type="submit">Submit Step 1</button>
       </form>
 
       <form>
@@ -106,7 +93,7 @@ const PaymentForm = () => {
           />
         </label>
         <br />
-        {/* No submit button here, as the second request is triggered automatically */}
+        <button type="button" onClick={handlePaymentDetailsSubmit}>Submit Step 2</button>
       </form>
     </div>
   );
